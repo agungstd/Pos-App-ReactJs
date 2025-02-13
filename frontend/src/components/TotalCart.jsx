@@ -29,7 +29,7 @@ const TotalCart = ({ carts }) => {
         <Col md={{ span: 3, offset: 9 }} className="bg-body pt-2">
           <div className="px-3">
             <h4>
-              Total Bayar :{" "}
+              Total Pembayaran :{" "}
               <strong className="float-end me-3">
                 Rp {sum.toLocaleString("id-ID")}
               </strong>
