@@ -20,28 +20,26 @@ export const updateCart = createAsyncThunk("cart/updateCart", async (data) => {
 
 export const delCart = createAsyncThunk("cart/delCart", async (data) => {
   await axios.delete(`/carts/${data}`);
-  const cart = await axios.get("/carts");
-  return cart.data;
+  const response = await axios.get("/carts");
+  return response.data;
 });
 
 export const updCart = createAsyncThunk("cart/updCart", async (data) => {
   data.totalPrice = data.qty * data.price;
   await axios.put(`/carts/${data.id}`, data);
-  const cart = await axios.get("/carts");
-  return cart.data;
+  const response = await axios.get("/carts");
+  return response.data;
 });
 
 export const saveOrder = createAsyncThunk("cart/saveOrder", async (data) => {
   await axios.post("/orders", data);
-  axios.get("/carts").then((cart) => {
-    const data = cart.data;
-    data.map(async (item) => {
-      try {
-        await axios.delete(`/carts/${item.id}`);
-      } catch (error) {
-        return null;
-      }
-    });
+  const cart = await axios.get("/carts");
+  cart.data.map(async (item) => {
+    try {
+      await axios.delete(`/carts/${item.id}`);
+    } catch (error) {
+      // handle error if needed
+    }
   });
   const response = await axios.get("/carts");
   return response.data;
