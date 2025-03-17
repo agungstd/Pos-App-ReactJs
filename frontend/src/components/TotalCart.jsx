@@ -1,44 +1,54 @@
 import PropTypes from "prop-types";
 import { Button, Col, Row } from "react-bootstrap";
 import { FaCartArrowDown } from "react-icons/fa";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { saveOrder } from "../features/CartSlice.js";
 import Swal from "sweetalert2";
-const TotalCart = ({ carts }) => {
+
+const TotalCart = () => {
   const dispatch = useDispatch();
+  const carts = useSelector((state) => state.cart.data);
+  
   let sum = 0;
-  if (carts) {
-    sum = carts.reduce(function (result, item) {
-      return result + parseInt(item.totalPrice);
+  if (carts && carts.length > 0) {
+    sum = carts.reduce((result, item) => {
+      return result + parseInt(item.totalPrice || item.price * item.qty);
     }, 0);
   }
 
-  const saveCartData = (data) => {
+  const saveCartData = () => {
+    if (!carts || carts.length === 0) {
+      Swal.fire("Error!", "Your cart is empty", "error");
+      return;
+    }
+    
     const orderData = {
       date: new Date(),
       total: sum,
-      detail: data,
+      detail: carts,
     };
+    
     dispatch(saveOrder(orderData));
-    Swal.fire("Order Success!", "", "success");
+    Swal.fire("Order Success!", "Your order has been placed", "success");
   };
 
   return (
     <div className="fixed-bottom">
       <Row>
-        <Col md={{ span: 3, offset: 9 }} className="bg-body pt-2">
+        <Col md={{ span: 3, offset: 9 }} className="bg-body pt-2 shadow">
           <div className="px-3">
             <h4>
-              Total Pembayaran :{" "}
+              Total Pembayaran:{" "}
               <strong className="float-end me-3">
                 Rp {sum.toLocaleString("id-ID")}
               </strong>
             </h4>
             <Button
               variant="primary"
-              className="w-100 me-3 mb-3"
+              className="w-100 me-3 mb-3 mt-2"
               size="lg"
-              onClick={() => saveCartData(carts)}
+              onClick={saveCartData}
+              disabled={!carts || carts.length === 0}
             >
               <FaCartArrowDown /> Bayar
             </Button>
@@ -47,10 +57,6 @@ const TotalCart = ({ carts }) => {
       </Row>
     </div>
   );
-};
-
-TotalCart.propTypes = {
-  carts: PropTypes.array,
 };
 
 export default TotalCart;
